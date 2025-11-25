@@ -1,4 +1,5 @@
-public class Answer{
+package Answers;
+public class Answer implements IAnswer{
     private String questionId;
     private String answerText;
     public Answer(String questionId, String answerText){

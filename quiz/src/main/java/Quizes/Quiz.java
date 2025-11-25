@@ -1,8 +1,12 @@
-public class Quiz{
+package Quizes;
+import Questions.IQuestion;
+import Answers.IAnswer;
+
+public class Quiz implements IQuiz{
     private String quizId;
     private String title;
-    private java.util.List<Question> questions;
-    private java.util.Map<String, Answer> userAnswers;
+    private java.util.List<IQuestion> questions;
+    private java.util.Map<String, IAnswer> userAnswers;
     private int totalScore;
     public Quiz(String quizId, String title){
         this.quizId = quizId;
@@ -11,21 +15,22 @@ public class Quiz{
         this.userAnswers = new java.util.HashMap<>();
         this.totalScore = 0;
     }
-    public void addQuestion(Question question){
+    
+    public void addQuestion(IQuestion question){
         questions.add(question);
     }
-    public boolean removeQuestion(String questionId){return questions.removeIf(q -> q.getId().equals(questionId));}
-    public Question getQuestion(int index){
+    public boolean removeQuestion(int questionId){return questions.removeIf(q -> Integer.parseInt(q.getId()) == questionId);}
+    public IQuestion getQuestion(int index){
         if (index >= 0 && index < questions.size()){
             return questions.get(index);
         } return null;
     }
-    public java.util.List<Question> getAllQuestions(){ return new java.util.ArrayList<>(questions); }
-    public void userAnswers(Answer answer){userAnswers.put(answer.getQuestionId(), answer);}
+    public java.util.List<IQuestion> getAllQuestions(){ return new java.util.ArrayList<>(questions); }
+    public void userAnswers(IAnswer answer){userAnswers.put(answer.getQuestionId(), answer);}
     public int calculateScore(){
         int score = 0;
-        for (Question question : questions){
-            Answer answer = userAnswers.get(question.getId());
+        for (IQuestion question : questions){
+            IAnswer answer = userAnswers.get(question.getId());
             if (answer != null && question.checkAnswer(answer)){
                 score += question.getScore();
             }
