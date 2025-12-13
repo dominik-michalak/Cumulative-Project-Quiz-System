@@ -1,7 +1,8 @@
 package Answers;
 
-public interface IAnswer {
+public interface IAnswer<T> {
     String getQuestionId();
-    String getAnswerText();
-    void setAnswerText(String answerText);
+    T getAnswerText();
+    T answer();
+    void setAnswerText(T answerText);
 }

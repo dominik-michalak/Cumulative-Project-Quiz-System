@@ -2,14 +2,14 @@ package Questions;
 
 import Answers.IAnswer;
 
-public interface IQuestion {
+public interface IQuestion<T> {
     String getId();
     String getQuestion();
-    String getCorrectAns();
+    T getCorrectAns();
     int getScore();
     void setScore(int score);
     String getCategory();
     void setCategory(String category);
     void displayQuestion();
-    boolean checkAnswer(IAnswer answer);
+    boolean checkAnswer(IAnswer<T> answer);
 }

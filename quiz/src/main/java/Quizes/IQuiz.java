@@ -3,12 +3,14 @@ package Quizes;
 import Answers.IAnswer;
 import Questions.IQuestion;
 
-public interface IQuiz {
-    void addQuestion (IQuestion question);
+import java.util.List;
+
+public interface IQuiz<T> {
+    void addQuestion (IQuestion<T> question);
     boolean removeQuestion (int questionId);
-    IQuestion getQuestion (int index);
-    java.util.List<IQuestion> getAllQuestions ();
-    void userAnswers (IAnswer answer);
+    IQuestion<T> getQuestion (int index);
+    List<IQuestion<T>> getAllQuestions ();
+    void userAnswers (IAnswer<T> answer);
     int calculateScore ();
     int getTotalScore ();
     int getQuestionCount ();

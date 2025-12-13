@@ -2,31 +2,37 @@ package Quizes;
 import Questions.IQuestion;
 import Answers.IAnswer;
 
-public class Quiz implements IQuiz{
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+public class Quiz<T> implements IQuiz<T>{
     private String quizId;
     private String title;
-    private java.util.List<IQuestion> questions;
-    private java.util.Map<String, IAnswer> userAnswers;
+    private List<IQuestion<T>> questions;
+    private Map<String, IAnswer<T>> userAnswers;
     private int totalScore;
+
     public Quiz(String quizId, String title){
         this.quizId = quizId;
         this.title = title;
-        this.questions = new java.util.ArrayList<>();
-        this.userAnswers = new java.util.HashMap<>();
+        this.questions = new ArrayList<>();
+        this.userAnswers = new HashMap<>();
         this.totalScore = 0;
     }
-    
-    public void addQuestion(IQuestion question){
+    public void addQuestion(IQuestion<T> question){
         questions.add(question);
     }
     public boolean removeQuestion(int questionId){return questions.removeIf(q -> Integer.parseInt(q.getId()) == questionId);}
-    public IQuestion getQuestion(int index){
+    public IQuestion<T> getQuestion(int index){
         if (index >= 0 && index < questions.size()){
             return questions.get(index);
         } return null;
     }
-    public java.util.List<IQuestion> getAllQuestions(){ return new java.util.ArrayList<>(questions); }
-    public void userAnswers(IAnswer answer){userAnswers.put(answer.getQuestionId(), answer);}
+    public List<IQuestion<T>> getAllQuestions(){ return new ArrayList<>(questions); }
+    public void userAnswers(IAnswer<T> answer){userAnswers.put(answer.getQuestionId(), answer);}
     public int calculateScore(){
         int score = 0;
         for (IQuestion question : questions){

@@ -1,35 +1,38 @@
 package Questions;
 import Answers.IAnswer;
+import java.util.Map;
 
-public class Question implements IQuestion {
+public abstract class Question<T> implements IQuestion<T> {
    private String id;
    private String question;
-   private String correctAns;
+   private T correctAnswer;
    private int score;
    private String category;
+   private Map<Character, String> answerOptions;
 
-   public Question(String var1, String var2, String var3, int var4, String var5) {
-      this.id = var1;
-      this.question = var2;
-      this.correctAns = var3;
-      this.score = var4;
-      this.category = var5;
-   }
+    public Question(String id, String question, T correctAnswer, int score, String category, Map<Character, String> answerOptions) {
+        this.id = id;
+        this.question = question;
+        this.correctAnswer = correctAnswer;
+        this.score = score;
+        this.category = category;
+        this.answerOptions = answerOptions;
+    }
 
-   public String getId() {
-      return this.id;
+    public String getId() {
+      return id;
    }
 
    public String getQuestion() {
-      return this.question;
+      return question;
    }
 
-   public String getCorrectAns() {
-      return this.correctAns;
+   public T getCorrectAns() {
+      return correctAnswer;
    }
 
    public int getScore() {
-      return this.score;
+      return score;
    }
 
    public void setScore(int var1) {
@@ -48,8 +51,11 @@ public class Question implements IQuestion {
       System.out.println("Q: " + this.question);
    }
 
-   public boolean checkAnswer(IAnswer var1) {
-      return var1 != null && var1.getAnswerText() != null ? var1.getAnswerText().trim().equalsIgnoreCase(this.correctAns.trim()) : false;
+   public boolean checkAnswer(IAnswer<T> answer) {
+      if (answer == null || answer.getAnswerText() == null) {
+         return false;
+      }
+      return answer.getAnswerText().equals(this.correctAnswer);
    }
 
    public String toString() {
