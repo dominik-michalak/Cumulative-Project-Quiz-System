@@ -1,55 +1,55 @@
 package Quizes;
-import Questions.IQuestion;
-import Answers.IAnswer;
 
+import Questions.Question;
+import Answers.Answer;
+import Answers.IAnswer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-public class Quiz<T> implements IQuiz<T>{
+public class Quiz<T> implements IQuiz<T> {
     private String quizId;
     private String title;
-    private List<IQuestion<T>> questions;
-    private Map<String, IAnswer<T>> userAnswers;
+    private List<Question<T>> questions;
+    private Map<String, Answer<T>> userAnswers;
     private int totalScore;
 
-    public Quiz(String quizId, String title){
+    public Quiz() {
+        this.questions = new ArrayList<>();
+        this.userAnswers = new HashMap<>();
+    }
+    public Quiz(String quizId, String title, List<Question<T>> questions) {
         this.quizId = quizId;
         this.title = title;
-        this.questions = new ArrayList<>();
+        this.questions = questions;
         this.userAnswers = new HashMap<>();
         this.totalScore = 0;
     }
-    public void addQuestion(IQuestion<T> question){
-        questions.add(question);
+    public void userAnswers(IAnswer<T> answer) {
+        if (answer instanceof Answer) {
+            userAnswers.put(answer.getQuestionId(), (Answer<T>) answer);
+        }
     }
-    public boolean removeQuestion(int questionId){return questions.removeIf(q -> Integer.parseInt(q.getId()) == questionId);}
-    public IQuestion<T> getQuestion(int index){
-        if (index >= 0 && index < questions.size()){
-            return questions.get(index);
-        } return null;
-    }
-    public List<IQuestion<T>> getAllQuestions(){ return new ArrayList<>(questions); }
-    public void userAnswers(IAnswer<T> answer){userAnswers.put(answer.getQuestionId(), answer);}
-    public int calculateScore(){
-        int score = 0;
-        for (IQuestion question : questions){
-            IAnswer answer = userAnswers.get(question.getId());
-            if (answer != null && question.checkAnswer(answer)){
-                score += question.getScore();
+    public int calculateScore() {
+        int tempScore = 0;
+        for (Question<T> q : questions) {
+            IAnswer<T> ans = userAnswers.get(q.getId());
+            if (ans != null && q.checkAnswer(ans)) {
+                tempScore += q.getScore();
             }
         }
-        return score;
+        this.totalScore = tempScore;
+        return tempScore;
     }
-    public int getTotalScore(){ return totalScore; }
-    public int getQuestionCount(){ return questions.size(); }
-    public String getQuizId(){ return quizId; }
-    public String getTitle(){ return title; }
-    public void setTitle(String title){ this.title = title; }
-    @Override
-    public String toString(){
-        return String.format("Quiz: %s (ID: %s, %d questions, %d points total)", title, quizId, questions.size(), calculateScore());}
-
+    public List<Question<T>> getQuestions() { return questions; } //entire collection
+    public int getTotalScore() { return totalScore; }
+    public void addQuestion(Questions.IQuestion<T> q) {questions.add((Question<T>) q);}
+    public boolean removeQuestion(int id) { return false; }
+    public Questions.IQuestion<T> getQuestion(int index) { return questions.get(index); } //single item
+    public List<Questions.IQuestion<T>> getAllQuestions() { return new ArrayList<>(questions); }
+    public int getQuestionCount() { return questions.size(); }
+    public String getQuizId() { return quizId; }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 }
