@@ -3,38 +3,34 @@ package Controllers;
 import Models.Answer;
 import Models.Question;
 import Models.Quiz;
-import Services.SaveAndReadJSON;
+import Services.QuizService;
 import Utilities.ConsoleUI;
-import Utilities.ThreadManager;
 
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 
 public class QuizTake {
     private Scanner scanner;
+    private QuizService quizService;
 
-    public QuizTake(Scanner scanner) {
+    public QuizTake(Scanner scanner, QuizService quizService) {
         this.scanner = scanner;
+        this.quizService = quizService;
     }
 
     public void start() {
         Quiz<String> quiz = selectQuizCategory();
         if (quiz == null) return;
-
         takeQuiz(quiz);
     }
 
     private Quiz<String> selectQuizCategory() {
         ConsoleUI.printInfo("Loading quizzes...");
-
-        Future<List<Quiz<String>>> future = ThreadManager.getExecutor().submit(() ->
-                SaveAndReadJSON.readQuizJSON("quiz_data.json")
-        );
         try {
-            List<Quiz<String>> quizzes = future.get(5, TimeUnit.SECONDS);
+            List<Quiz<String>> quizzes = quizService.loadQuizzesAsync()
+                    .get(5, TimeUnit.SECONDS);
             if (quizzes == null || quizzes.isEmpty()) {
                 ConsoleUI.printError("No quizzes found");
                 return null;

@@ -1,20 +1,29 @@
 package Controllers;
 
+import Data.DataManager;
+import Data.JsonQuizManager;
+import Models.Quiz;
+import Services.QuizService;
 import Utilities.*;
 
 import java.util.Scanner;
 
 public class QuizManager {
     private Scanner scanner;
+    private QuizService quizService;
     private QuizTake quizTaker;
     private QuizCreate quizCreator;
     private QuizEdit quizEditor;
 
     public QuizManager() {
         this.scanner = new Scanner(System.in);
-        this.quizTaker = new QuizTake(scanner);
-        this.quizCreator = new QuizCreate(scanner);
-        this.quizEditor = new QuizEdit(scanner);
+
+        DataManager<Quiz<String>> dataManager = new JsonQuizManager();
+        this.quizService = new QuizService(dataManager);
+
+        this.quizTaker = new QuizTake(scanner, quizService);
+        this.quizCreator = new QuizCreate(scanner, quizService);
+        this.quizEditor = new QuizEdit(scanner, quizService);
     }
 
     public void run() {
@@ -26,7 +35,7 @@ public class QuizManager {
 
             switch (choice) {
                 case 1:
-                    handleTakeQuiz(true);
+                    handleTakeQuiz();
                     break;
                 case 2:
                     handleCreateQuiz();
@@ -52,7 +61,7 @@ public class QuizManager {
         System.out.println("4. Exit");
     }
 
-    private void handleTakeQuiz(boolean withTimer) {
+    private void handleTakeQuiz() {
         quizTaker.start();
     }
 
@@ -68,7 +77,7 @@ public class QuizManager {
 
     private void handleExit() {
         ConsoleUI.printInfo("Exiting quiz system...");
-        ThreadManager.shutdown();
+        quizService.shutdown();
         scanner.close();
         System.out.println("\nThank you for using Quiz System");
     }

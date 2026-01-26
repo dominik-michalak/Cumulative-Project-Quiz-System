@@ -2,8 +2,7 @@ package Controllers;
 
 import Models.Question;
 import Models.Quiz;
-import Services.*;
-import Services.SaveAndReadJSON;
+import Services.QuizService;
 import Utilities.ConsoleUI;
 import Utilities.QuestionBuilder;
 
@@ -12,30 +11,25 @@ import java.util.Scanner;
 
 public class QuizEdit {
     private Scanner scanner;
+    private QuizService quizService;
 
-    public QuizEdit(Scanner scanner) {
+    public QuizEdit(Scanner scanner, QuizService quizService) {
         this.scanner = scanner;
+        this.quizService = quizService;
     }
 
     public void editQuiz() {
         ConsoleUI.printHeader("EDIT QUIZ");
-
-        // Load all quizzes
-        List<Quiz<String>> quizzes = SaveAndReadJSON.readQuizJSON("quiz_data.json");
-
+        List<Quiz<String>> quizzes = quizService.getAllQuizzes();
         if (quizzes == null || quizzes.isEmpty()) {
             ConsoleUI.printError("No quizzes found");
             return;
         }
-
-        // Display available quizzes
         ConsoleUI.printInfo("Available Quizzes:");
         for (int i = 0; i < quizzes.size(); i++) {
             System.out.println((i + 1) + ". " + quizzes.get(i).getTitle() +
                     " (" + quizzes.get(i).getQuestionCount() + " questions)");
         }
-
-        // Select quiz
         int choice = ConsoleUI.readInt("\nSelect quiz to edit (1-" + quizzes.size() + "): ");
 
         if (choice < 1 || choice > quizzes.size()) {
@@ -48,8 +42,6 @@ public class QuizEdit {
 
         ConsoleUI.printSuccess("Loaded: " + quiz.getTitle());
         ConsoleUI.printInfo("Questions: " + quiz.getQuestionCount());
-
-        // Edit menu loop
         while (true) {
             showEditMenu();
             int menuChoice = ConsoleUI.readInt("\nChoice: ");
@@ -72,8 +64,12 @@ public class QuizEdit {
                     break;
                 case 6:
                     quizzes.set(quizIndex, quiz);
-                    SaveAndReadJSON.saveQuiz(quizzes, "quiz_data.json");
-                    ConsoleUI.printSuccess("Quiz saved");
+                    quizService.updateQuizAsync(quiz.getQuizId(), quiz)
+                            .thenRun(() -> ConsoleUI.printSuccess("Quiz saved"))
+                            .exceptionally(ex -> {
+                                ConsoleUI.printError("Failed to save: " + ex.getMessage());
+                                return null;
+                            });
                     return;
                 case 7:
                     ConsoleUI.printInfo("Changes discarded");
@@ -227,11 +223,6 @@ public class QuizEdit {
         } else {
             ConsoleUI.printInfo("Title unchanged");
         }
-    }
-
-    private void saveAndExit(List<Quiz<String>> allQuizzes, String filename) {
-        SaveAndReadJSON.saveQuiz(allQuizzes, filename);
-        ConsoleUI.printSuccess("Quiz saved successfully");
     }
     private Question<String> createQuestion() {
         return QuestionBuilder.createQuestion(scanner);

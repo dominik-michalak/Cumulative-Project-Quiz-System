@@ -2,7 +2,7 @@ package Controllers;
 
 import Models.Question;
 import Models.Quiz;
-import Services.SaveAndReadJSON;
+import Services.QuizService;
 import Utilities.ConsoleUI;
 import Utilities.QuestionBuilder;
 
@@ -14,9 +14,11 @@ import java.util.UUID;
 
 public class QuizCreate {
     private Scanner scanner;
+    private final QuizService quizService;
 
-    public QuizCreate(Scanner scanner) {
+    public QuizCreate(Scanner scanner, QuizService quizService) {
         this.scanner = scanner;
+        this.quizService = quizService;
     }
 
     public void createQuiz() {
@@ -50,16 +52,9 @@ public class QuizCreate {
             ConsoleUI.printError("No questions added! Quiz not created");
             return;
         }
-
         String quizId = "QUIZ-" + UUID.randomUUID().toString().substring(0, 6);
         Quiz<String> quiz = new Quiz<>(quizId, title, new ArrayList<>(questions));
-        List<Quiz<String>> existingQuizzes = SaveAndReadJSON.readQuizJSON("quiz_data.json");
-        if (existingQuizzes == null) {
-            existingQuizzes = new ArrayList<>();
-        }
-        existingQuizzes.add(quiz);
 
-        SaveAndReadJSON.saveQuiz(existingQuizzes, "quiz_data.json");
         ConsoleUI.printSuccess("Quiz '" + title + "' created with " + questions.size() + " questions");
     }
 
